@@ -26,24 +26,21 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     //TODO: add settings
-    //TODO: add SheredPref
     //TODO: add DateDetectionAutoRemoval
     //TODO: implment search function
+    //TODO: implement dialog delete for transaction on long press
     Button BTNAdd;
     RecyclerView RVTransatcions;
     TextView TVBalanceNumber;
     private List<Transaction> transactions = new ArrayList<>();
     private double initialBalance = 0;
+    private SharedPreferencesDB db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        //random test values
-        transactions.add(new Transaction(1, "New PC", "3000", "01.01.12", 1));
-        transactions.add(new Transaction(2, "New Phone", "1512", "17.03.12", 1));
-        transactions.add(new Transaction(3, "Salary", "6400", "10.01.12", 0));
 
         BTNAdd = findViewById(R.id.BTNAdd);
         RVTransatcions = findViewById(R.id.RVTransatcions);
@@ -54,6 +51,14 @@ public class MainActivity extends AppCompatActivity {
                 setBalance(v);
             }
         });
+        db = SharedPreferencesDB.getInstance(this);
+        if (!db.hasBalance()) {
+            setBalance(null);
+        } else {
+            initialBalance = db.getBalance();
+            updateBalanceDisplay();
+        }
+        transactions = db.getTransactions();
 
         RVTransatcions.setLayoutManager(new LinearLayoutManager(this));
         Adapter adapter = new Adapter(transactions, this);
@@ -62,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 openAddTransaction(v, adapter);
+                RVTransatcions.scrollToPosition(transactions.size() - 1);
             }
         });
 
@@ -102,12 +108,13 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 transactions.add(new Transaction(transactions.size() + 1, title, amount, date, isExpense ? 1 : 0));
+                db.saveTransactions(transactions);
                 adapter.notifyDataSetChanged();
                 updateBalanceDisplay();
                 dialog.dismiss();
+
             }
         });
-
         return dialog;
     }
     public Dialog setBalance(View view) {
@@ -126,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 initialBalance = Double.parseDouble(balanceStr);
+                db.setBalance(initialBalance);
                 updateBalanceDisplay();
                 dialog.dismiss();
             }
@@ -142,7 +150,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 totalTransactions -= amt;
             }
-
         }
         double currentBalance = initialBalance + totalTransactions;
         TVBalanceNumber.setText(String.format("%.2f (%.2f)", currentBalance, initialBalance));
