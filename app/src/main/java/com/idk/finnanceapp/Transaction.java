@@ -4,19 +4,27 @@ public class Transaction {
     private String title;
     private String amount;
     private String date;
-    private static int type;
+    private int type;
+    private int id;
 
-    public Transaction(String title, String amount, String date, int type) {
+    public final int INCOME = 0;
+    public final int EXPENSE = 1;
+
+
+    public Transaction(int ID, String title, String amount, String date, int type) {
         this.title = title;
         this.amount = amount;
         this.date = date;
         this.type = type;
+        this.id = ID;
     }
 
     public String getTitle() {
         return title;
     }
-
+    public int getID() {
+        return id;
+    }
     public String getAmount() {
         return amount;
     }
@@ -29,13 +37,13 @@ public class Transaction {
         return type;
     }
     public String toString(Transaction transaction){
-        String STransaction = "Title: " + transaction.getTitle();
+
+        String STransaction = transaction.getID() + transaction.getTitle();
         if (type == 0){
-            STransaction += "Amount: - " + transaction.getAmount();
+            STransaction += "- " + transaction.getAmount() + transaction.getDate();
         }else{
-            STransaction += "Amount: + " + transaction.getAmount();
+            STransaction += "+ " + transaction.getAmount() + transaction.getDate();
         }
-        STransaction += "Date: " + transaction.getDate();
 
         return STransaction;
     }
