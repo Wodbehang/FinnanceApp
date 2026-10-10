@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -26,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    //TODO: add settings
     Button BTNAdd;
+    ImageButton BTNSettings;
     RecyclerView RVTransatcions;
     TextView TVBalanceNumber;
     private List<Transaction> transactions = new ArrayList<>();
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         BTNAdd = findViewById(R.id.BTNAdd);
         RVTransatcions = findViewById(R.id.RVTransatcions);
         TVBalanceNumber = findViewById(R.id.TVBalanceNumber);
+        BTNSettings = findViewById(R.id.BTNSettings);
         TVBalanceNumber.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,6 +69,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 openAddTransaction(v, adapter);
                 RVTransatcions.scrollToPosition(transactions.size() - 1);
+            }
+        });
+        BTNSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
             }
         });
         SVSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -205,10 +214,6 @@ public class MainActivity extends AppCompatActivity {
         }
         double currentBalance = initialBalance + totalTransactions;
         TVBalanceNumber.setText(String.format("%.2f (%.2f)", currentBalance, initialBalance));
-    }
-    public void openSettings(View view) {
-        Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent);
     }
 
     public SearchView getSVSearch() {
