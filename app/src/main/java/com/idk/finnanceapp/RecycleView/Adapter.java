@@ -59,6 +59,16 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             TVDate.setText(transaction.getDate());
         }
     }
-
+    public void removeItem(int position) {
+        transactions.remove(position);
+        notifyItemRemoved(position);
+    }
+    public void setFilteredList(List<Transaction> filteredList) {
+        this.transactions = filteredList;
+        notifyDataSetChanged();
+    }
+    public int getItemViewCount(int position) {
+        return transactions.size();
+    }
 }
 

@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -26,8 +27,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     //TODO: add settings
-    //TODO: add DateDetectionAutoRemoval
-    //TODO: implment search function
     //TODO: implement dialog delete for transaction on long press
     Button BTNAdd;
     RecyclerView RVTransatcions;
@@ -35,13 +34,14 @@ public class MainActivity extends AppCompatActivity {
     private List<Transaction> transactions = new ArrayList<>();
     private double initialBalance = 0;
     private SharedPreferencesDB db;
+    SearchView SVSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-
+        SVSearch = findViewById(R.id.SVSearch);
         BTNAdd = findViewById(R.id.BTNAdd);
         RVTransatcions = findViewById(R.id.RVTransatcions);
         TVBalanceNumber = findViewById(R.id.TVBalanceNumber);
@@ -70,8 +70,19 @@ public class MainActivity extends AppCompatActivity {
                 RVTransatcions.scrollToPosition(transactions.size() - 1);
             }
         });
+        SVSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Search(newText);
+                return false;
+            }
 
-
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Search(query);
+                return false;
+            }
+        });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -80,6 +91,12 @@ public class MainActivity extends AppCompatActivity {
         });
         updateBalanceDisplay();
     }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        db.saveTransactions(transactions);
+    }
+
     public Dialog openAddTransaction(View view,Adapter adapter) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.add_transaction_dialog, null);
@@ -159,4 +176,20 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public SearchView getSVSearch() {
+        return SVSearch;
+    }
+    public void Search(String str){
+        List<Transaction> filteredList = new ArrayList<>();
+        for (Transaction transaction : transactions) {
+            if (transaction.getTitle().toLowerCase().contains(str.toLowerCase())) {
+                filteredList.add(transaction);
+            }
+        }
+        if (filteredList.isEmpty()) {
+            return;
+        }
+        Adapter adapter = (Adapter) RVTransatcions.getAdapter();
+        adapter.setFilteredList(filteredList);
+    }
 }
