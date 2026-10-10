@@ -27,7 +27,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     //TODO: add settings
-    //TODO: implement dialog delete for transaction on long press
     Button BTNAdd;
     RecyclerView RVTransatcions;
     TextView TVBalanceNumber;
@@ -83,6 +82,12 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+        adapter.setOnItemLongClickListener(new Adapter.onItemLongClickListener() {
+            @Override
+            public void onItemLongClick(Transaction transaction) {
+                DeleteTransaction(transaction, adapter);
+            }
+        });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -134,6 +139,31 @@ public class MainActivity extends AppCompatActivity {
         });
         return dialog;
     }
+    public Dialog DeleteTransaction(Transaction transaction, Adapter adapter) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.remove_dialog, null);
+        builder.setView(dialogView);
+        Dialog dialog = builder.create();
+        dialog.show();
+        Button BTNDenyRDialog = dialogView.findViewById(R.id.BTNDenyRDialog);
+        Button BTNConfirmRDialog = dialogView.findViewById(R.id.BTNConfirmRDialog);
+        BTNDenyRDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        BTNConfirmRDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeTransaction(transaction);
+                adapter.notifyDataSetChanged();
+
+                dialog.dismiss();
+            }
+        });
+        return dialog;
+    }
     public Dialog setBalance(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.set_balance_dialog, null);
@@ -156,6 +186,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         return dialog;
+    }
+    public void removeTransaction(Transaction transaction) {
+        transactions.remove(transaction);
+        db.saveTransactions(transactions);
+        updateBalanceDisplay();
     }
 
     private void updateBalanceDisplay() {
