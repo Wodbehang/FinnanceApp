@@ -6,6 +6,8 @@ public class Transaction {
     private String date;
     private int type;
     private int id;
+    private String category;
+    private String note;
 
     public final int INCOME = 0;
     public final int EXPENSE = 1;
@@ -18,9 +20,24 @@ public class Transaction {
         this.type = type;
         this.id = ID;
     }
+    public Transaction(int ID, String title, String amount, String date, int type, String category, String note) {
+        this.title = title;
+        this.amount = amount;
+        this.date = date;
+        this.type = type;
+        this.id = ID;
+        this.category = category;
+        this.note = note;
+    }
 
     public String getTitle() {
         return title;
+    }
+    public String getCategory() {
+        return category;
+    }
+    public String getNote() {
+        return note;
     }
     public int getID() {
         return id;
