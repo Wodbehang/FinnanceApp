@@ -28,14 +28,15 @@ public class SettingsActivity extends AppCompatActivity {
         BTNClearData = findViewById(R.id.BTNClearData);
         BTNExport = findViewById(R.id.BTNExport);
         utilitis = new Utilitis();
-        db = SharedPreferencesDB.getInstance(this);
+        SharedPreferencesDB db = SharedPreferencesDB.getInstance(SettingsActivity.this);
 
         BTNClearData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferencesDB db = SharedPreferencesDB.getInstance(SettingsActivity.this);
                 db.clear();
                 db.removeBalance();
+                Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
+                startActivity(intent);
                 finish();
             }
         });

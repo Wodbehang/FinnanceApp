@@ -110,6 +110,14 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         db.saveTransactions(transactions);
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        transactions = db.getTransactions();
+        Adapter adapter = (Adapter) RVTransatcions.getAdapter();
+        adapter.notifyDataSetChanged();
+        updateBalanceDisplay();
+    }
 
     public Dialog openAddTransaction(View view,Adapter adapter) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
