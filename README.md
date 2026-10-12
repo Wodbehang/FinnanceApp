@@ -5,7 +5,7 @@
 
 ## mainActicity
 
-<img width="307" height="548" alt="{345D6641-1116-4801-BD5D-5A6BA6746F88}" src="https://github.com/user-attachments/assets/8e42e1b9-cd31-411e-bf58-2884f25b84cb" />
+<img width="394" height="884" alt="{0A7903C8-01CE-4AEC-8DB7-64AD81A7F573}" src="https://github.com/user-attachments/assets/5cf19553-0211-471f-a421-2ff0c0ab3e1e" />
 
 clicking on the balance allows to set it before the calculations and using the plus buttom to add transactions.
 
