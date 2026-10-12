@@ -28,7 +28,7 @@ public class SettingsActivity extends AppCompatActivity {
         BTNClearData = findViewById(R.id.BTNClearData);
         BTNExport = findViewById(R.id.BTNExport);
         utilitis = new Utilitis();
-        SharedPreferencesDB db = SharedPreferencesDB.getInstance(SettingsActivity.this);
+        db = SharedPreferencesDB.getInstance(SettingsActivity.this);
 
         BTNClearData.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,14 +44,14 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (ExportTransactions()) {
-                    File file = new File(getExternalFilesDir(null) + "/transactions.csv");
-                    Uri uri = androidx.core.content.FileProvider.getUriForFile(SettingsActivity.this, "com.idk.finnanceapp.fileprovider", new File(getExternalFilesDir(null) + "/transactions.csv"));
+                    File file = new File(getExternalFilesDir(null), "transactions.csv");
+                    Uri uri = androidx.core.content.FileProvider.getUriForFile(SettingsActivity.this, "com.idk.finnanceapp.fileprovider", file);
 
-                    Intent shereUntent = new Intent(Intent.ACTION_SEND);
-                    shereUntent.setType("text/csv");
-                    shereUntent.putExtra(Intent.EXTRA_STREAM, uri);
-                    shereUntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    startActivity(shereUntent);
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("text/csv");
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    startActivity(shareIntent);
                 }
             }
         });
