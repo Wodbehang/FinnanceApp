@@ -59,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
             initialBalance = db.getBalance();
             updateBalanceDisplay();
         }
-        transactions = db.getTransactions();
+        transactions.clear();
+        transactions.addAll(db.getTransactions());
 
         RVTransatcions.setLayoutManager(new LinearLayoutManager(this));
         Adapter adapter = new Adapter(transactions, this);
@@ -105,17 +106,24 @@ public class MainActivity extends AppCompatActivity {
         });
         updateBalanceDisplay();
     }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        db.saveTransactions(transactions);
-    }
+
     @Override
     protected void onResume() {
         super.onResume();
-        transactions = db.getTransactions();
+        if (!db.hasBalance()) {
+            initialBalance = 0;
+            setBalance(null);
+        } else {
+            initialBalance = db.getBalance();
+        }
+
+        List<Transaction> freshData = db.getTransactions();
+        transactions.clear();
+        transactions.addAll(freshData);
         Adapter adapter = (Adapter) RVTransatcions.getAdapter();
-        adapter.notifyDataSetChanged();
+        if (adapter != null) {
+            adapter.setFilteredList(transactions);
+        }
         updateBalanceDisplay();
     }
 
@@ -148,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 transactions.add(new Transaction(transactions.size() + 1, title, amount, date, isExpense ? 1 : 0));
                 db.saveTransactions(transactions);
-                adapter.notifyDataSetChanged();
+                Search(SVSearch.getQuery().toString());
                 updateBalanceDisplay();
                 dialog.dismiss();
 
@@ -174,8 +182,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 removeTransaction(transaction);
-                adapter.notifyDataSetChanged();
-
+                Search(SVSearch.getQuery().toString());
                 dialog.dismiss();
             }
         });
@@ -228,16 +235,21 @@ public class MainActivity extends AppCompatActivity {
         return SVSearch;
     }
     public void Search(String str){
-        List<Transaction> filteredList = new ArrayList<>();
-        for (Transaction transaction : transactions) {
-            if (transaction.getTitle().toLowerCase().contains(str.toLowerCase())) {
-                filteredList.add(transaction);
+        List<Transaction> displayList;
+        if (str == null || str.isEmpty()) {
+            displayList = transactions;
+        } else {
+            displayList = new ArrayList<>();
+            String query = str.toLowerCase();
+            for (Transaction transaction : transactions) {
+                if (transaction.getTitle().toLowerCase().contains(query)) {
+                    displayList.add(transaction);
+                }
             }
         }
-        if (filteredList.isEmpty()) {
-            return;
-        }
         Adapter adapter = (Adapter) RVTransatcions.getAdapter();
-        adapter.setFilteredList(filteredList);
+        if (adapter != null) {
+            adapter.setFilteredList(displayList);
+        }
     }
 }
