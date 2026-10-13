@@ -137,9 +137,14 @@ public class MainActivity extends AppCompatActivity {
         BTNSaveTransactionDialog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Transaction newTransaction;
                 CheckBox CBisExpense = dialogView.findViewById(R.id.CBIsExpenseDialog);
                 EditText etTitle = dialogView.findViewById(R.id.TVShortDescriptionDialog);
                 String desc = etTitle.getText().toString();
+                EditText etCatagory = dialogView.findViewById(R.id.ETCatagories);
+                String catagory = etCatagory.getText().toString();
+                EditText etNote = dialogView.findViewById(R.id.TVNotes);
+                String note = etNote.getText().toString();
                 EditText etAmount = dialogView.findViewById(R.id.TVAmountDialog);
                 String amount = etAmount.getText().toString();
                 EditText etDate = dialogView.findViewById(R.id.TVDateDialog);
@@ -154,7 +159,19 @@ public class MainActivity extends AppCompatActivity {
                 if (title.isEmpty() || amount.isEmpty() || date.isEmpty()) {
                     return;
                 }
-                transactions.add(new Transaction(transactions.size() + 1, title, amount, date, isExpense ? 1 : 0));
+                if (note.isEmpty() && desc.isEmpty()){
+                    newTransaction = new Transaction(transactions.size() + 1, title, amount, date, isExpense ? 1 : 0, "", "");
+                }
+                else if (note.isEmpty()){
+                    newTransaction = new Transaction(transactions.size() + 1, title, amount, date, isExpense ? 1 : 0, catagory, "");
+                }
+                else if (catagory.isEmpty()){
+                    newTransaction = new Transaction(transactions.size() + 1, title, amount, date, isExpense ? 1 : 0, "", note);
+                }
+                else {
+                    newTransaction = new Transaction(transactions.size() + 1, title, amount, date, isExpense ? 1 : 0, catagory, note);
+                }
+                transactions.add(newTransaction);
                 db.saveTransactions(transactions);
                 Search(SVSearch.getQuery().toString());
                 updateBalanceDisplay();
