@@ -10,6 +10,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.SearchView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -134,6 +135,10 @@ public class MainActivity extends AppCompatActivity {
         Dialog dialog = builder.create();
         dialog.show();
         Button BTNSaveTransactionDialog = dialogView.findViewById(R.id.BTNSaveTransactionDialog);
+        Spinner spCatagories = dialogView.findViewById(R.id.SPCatagories);
+        List<String> categories = getCategories();
+        android.widget.ArrayAdapter<String> SPAdapter = new android.widget.ArrayAdapter<>(MainActivity.this, android.R.layout.simple_spinner_item, categories);
+        spCatagories.setAdapter(SPAdapter);
         BTNSaveTransactionDialog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,6 +154,14 @@ public class MainActivity extends AppCompatActivity {
                 String amount = etAmount.getText().toString();
                 EditText etDate = dialogView.findViewById(R.id.TVDateDialog);
                 String date = etDate.getText().toString();
+                if (spCatagories.getSelectedItem() != null) {
+                    catagory = spCatagories.getSelectedItem().toString();
+
+                }
+                else if (catagory.isEmpty()) {
+                    catagory = "None";
+                }
+
                 String title = desc;
                 boolean isExpense;
                 if (CBisExpense.isChecked()) {
@@ -250,6 +263,22 @@ public class MainActivity extends AppCompatActivity {
 
     public SearchView getSVSearch() {
         return SVSearch;
+    }
+    public List<String> getCategories() {
+        List<String> categories = new ArrayList<>();
+        categories.add("None");
+        categories.add("Food");
+        categories.add("Transport");
+        categories.add("Health");
+        categories.add("Education");
+        categories.add("Entertainment");
+        categories.add("Other");
+        for (Transaction transaction : transactions) {
+            if (!categories.contains(transaction.getCategory())) {
+                categories.add(transaction.getCategory());
+            }
+        }
+        return categories;
     }
     public void Search(String str){
         List<Transaction> displayList;
