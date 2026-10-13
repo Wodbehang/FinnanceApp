@@ -288,7 +288,13 @@ public class MainActivity extends AppCompatActivity {
             displayList = new ArrayList<>();
             String query = str.toLowerCase();
             for (Transaction transaction : transactions) {
-                if (transaction.getTitle().toLowerCase().contains(query)) {
+                if (transaction.getTitle() != null && transaction.getTitle().toLowerCase().contains(query)) {
+                    displayList.add(transaction);
+                }
+                else if (transaction.getCategory() != null && transaction.getCategory().toLowerCase().contains(query)) {
+                    displayList.add(transaction);
+                }
+                else if (transaction.getNote() != null && transaction.getNote().toLowerCase().contains(query)) {
                     displayList.add(transaction);
                 }
             }
