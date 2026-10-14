@@ -76,7 +76,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
             } else {
                 TVAmount.setText("- " + transaction.getAmount());
             }
-            TVDate.setText(transaction.getDate());
+            TVDate.setText(transaction.getDate().toString());
         }
     }
     public void setFilteredList(List<Transaction> filteredList) {

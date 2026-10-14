@@ -17,9 +17,9 @@ public class Utilitis {
     public void saveTransactionsToCVS(List<Transaction> transactions, String filePath) {
         File file = new File(filePath);
         try (FileWriter writer = new FileWriter(file)) {
-            writer.write("Name,Amount,Category,Notes\n");
+            writer.write("Date,Name,Amount,Category,Notes\n");
             for (Transaction transaction : transactions) {
-                writer.write(transaction.getTitle()  + "," + transaction.getAmount() + "," + transaction.getCategory() + "," + transaction.getNote() + "\n");
+                writer.write(transaction.getDate() + "," + transaction.getTitle()  + "," + transaction.getAmount() + "," + transaction.getCategory() + "," + transaction.getNote() + "\n");
             }
         } catch (IOException e) {
             e.printStackTrace();

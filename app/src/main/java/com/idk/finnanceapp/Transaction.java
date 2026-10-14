@@ -1,9 +1,11 @@
 package com.idk.finnanceapp;
 
+import com.idk.finnanceapp.RecycleView.Date;
+
 public class Transaction {
     private String title;
     private String amount;
-    private String date;
+    private Date date;
     private int type;
     private int id;
     private String category;
@@ -13,14 +15,14 @@ public class Transaction {
     public final int EXPENSE = 1;
 
 
-    public Transaction(int ID, String title, String amount, String date, int type) {
+    public Transaction(int ID, String title, String amount, Date date, int type) {
         this.title = title;
         this.amount = amount;
         this.date = date;
         this.type = type;
         this.id = ID;
     }
-    public Transaction(int ID, String title, String amount, String date, int type, String category, String note) {
+    public Transaction(int ID, String title, String amount, Date date, int type, String category, String note) {
         this.title = title;
         this.amount = amount;
         this.date = date;
@@ -46,7 +48,7 @@ public class Transaction {
         return amount;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 

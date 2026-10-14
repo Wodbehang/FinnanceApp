@@ -22,10 +22,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.idk.finnanceapp.RecycleView.Adapter;
+import com.idk.finnanceapp.RecycleView.Date;
 import com.idk.finnanceapp.Transaction;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
     Button BTNAdd;
@@ -62,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         }
         transactions.clear();
         transactions.addAll(db.getTransactions());
+        transactions = sortByDate(transactions);
 
         RVTransatcions.setLayoutManager(new LinearLayoutManager(this));
         Adapter adapter = new Adapter(transactions, this);
@@ -119,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         List<Transaction> freshData = db.getTransactions();
+        freshData = sortByDate(freshData);
         transactions.clear();
         transactions.addAll(freshData);
         Adapter adapter = (Adapter) RVTransatcions.getAdapter();
@@ -153,7 +159,13 @@ public class MainActivity extends AppCompatActivity {
                 EditText etAmount = dialogView.findViewById(R.id.TVAmountDialog);
                 String amount = etAmount.getText().toString();
                 EditText etDate = dialogView.findViewById(R.id.TVDateDialog);
-                String date = etDate.getText().toString();
+                String[] dateParts = etDate.getText().toString().split("\\.");
+                Date date = null;
+                if (dateParts.length >= 3) {
+                    try {
+                        date = new Date(Integer.parseInt(dateParts[0]), Integer.parseInt(dateParts[1]), Integer.parseInt(dateParts[2]));
+                    } catch (NumberFormatException ignored) {}
+                }
                 if (spCatagories.getSelectedItem() != null) {
                     catagory = spCatagories.getSelectedItem().toString();
 
@@ -169,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     isExpense = false;
                 }
-                if (title.isEmpty() || amount.isEmpty() || date.isEmpty()) {
+                if (title.isEmpty() || amount.isEmpty() || date == null) {
                     return;
                 }
                 if (note.isEmpty() && desc.isEmpty()){
@@ -303,5 +315,34 @@ public class MainActivity extends AppCompatActivity {
         if (adapter != null) {
             adapter.setFilteredList(displayList);
         }
+    }
+    public List<Transaction> sortByDate(List<Transaction> transactions){
+        if (transactions == null || transactions.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return transactions.stream()
+                .sorted((t1, t2) -> {
+                    Date date1 = t1.getDate();
+                    Date date2 = t2.getDate();
+                    if (date1 == null && date2 == null) {
+                        return 0;
+                    }
+                    if (date1 == null) {
+                        return 1;
+                    }
+                    if (date2 == null) {
+                        return -1;
+                    }
+                    int yearDiff = date1.getYear() - date2.getYear();
+                    if (yearDiff != 0) {
+                        return yearDiff;
+                    }
+                    int monthDiff = date1.getMonth() - date2.getMonth();
+                    if (monthDiff != 0) {
+                        return monthDiff;
+                    }
+                    return Integer.compare(date1.getDay(), date2.getDay());
+
+                }).collect(Collectors.toList());
     }
 }
