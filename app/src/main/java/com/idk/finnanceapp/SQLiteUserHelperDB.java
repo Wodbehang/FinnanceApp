@@ -4,6 +4,7 @@ import static com.idk.finnanceapp.SQLiteUser.SQL_CREATE_ENTRIES;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -32,12 +33,26 @@ public class SQLiteUserHelperDB extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
 
     }
+    public static String stopDuplicateEmail(String email) {
+        if (email == null) return "";
+        String trimmedEmail = email.trim().toLowerCase();
+        int atIndex = trimmedEmail.indexOf('@');
+        if (atIndex != -1) {
+            String localPart = trimmedEmail.substring(0, atIndex).replace(".", "");
+            String domainPart = trimmedEmail.substring(atIndex);
+            return localPart + domainPart;
+        }
+        return trimmedEmail.replace(".", "");
+    }
+
     public void newUser(String username, String email, String password){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        String path = createPath(username);
-        values.put(SQLiteUser.UserEntry.COLUMN_NAME_USERNAME, username);
-        values.put(SQLiteUser.UserEntry.COLUMN_NAME_EMAIL, email);
+        String normalizedUsername = username != null ? username.trim().toLowerCase() : "";
+        String normalizedEmail = stopDuplicateEmail(email);
+        String path = createPath(normalizedUsername);
+        values.put(SQLiteUser.UserEntry.COLUMN_NAME_USERNAME, normalizedUsername);
+        values.put(SQLiteUser.UserEntry.COLUMN_NAME_EMAIL, normalizedEmail);
         values.put(SQLiteUser.UserEntry.COLUMN_NAME_PASSWORD, password);
         values.put(SQLiteUser.UserEntry.COLUMN_NAME_PATH, path);
         db.insert(SQLiteUser.UserEntry.TABLE_NAME, null, values);
@@ -52,6 +67,31 @@ public class SQLiteUserHelperDB extends SQLiteOpenHelper {
         String uniquePath = UUID.randomUUID().toString().substring(0, 8);
         String path = folder.getAbsolutePath() + File.separator + cleanUsername + "_" + uniquePath + ".csv";
         return path;
+    }
+    public boolean checkUser(String input, String password){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = { SQLiteUser.UserEntry._ID };
+        
+        String trimmedInput = input != null ? input.trim().toLowerCase() : "";
+        String normalizedInput = stopDuplicateEmail(input);
+
+        String selection = "(" +
+                "LOWER(" + SQLiteUser.UserEntry.COLUMN_NAME_EMAIL + ") = ? OR " +
+                "LOWER(" + SQLiteUser.UserEntry.COLUMN_NAME_EMAIL + ") = ? OR " +
+                "LOWER(" + SQLiteUser.UserEntry.COLUMN_NAME_USERNAME + ") = ?" +
+                ") AND " + SQLiteUser.UserEntry.COLUMN_NAME_PASSWORD + " = ?";
+
+        String[] selectionArgs = {
+                normalizedInput,
+                trimmedInput,
+                trimmedInput,
+                password
+        };
+        Cursor cursor = db.query(SQLiteUser.UserEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+        int cursorCount = cursor.getCount();
+        cursor.close();
+        db.close();
+        return cursorCount > 0;
     }
 
 }

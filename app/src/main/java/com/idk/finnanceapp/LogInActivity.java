@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +18,8 @@ public class LogInActivity extends AppCompatActivity {
     EditText password;
     Button login;
     Button signUp;
+    SQLiteUserHelperDB sqliteUserHelperDB;
+
 
 
     @Override
@@ -24,6 +27,7 @@ public class LogInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_log_in);
+        sqliteUserHelperDB = new SQLiteUserHelperDB(this);
         username = findViewById(R.id.ETUsernameLog);
         password = findViewById(R.id.ETPasswordLog);
         login = findViewById(R.id.BTNLogIn);
@@ -36,9 +40,12 @@ public class LogInActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(validateCardentials(username.getText().toString(), password.getText().toString())){
+                if(validateCardentials(username.getText().toString().toLowerCase(), password.getText().toString())){
                     Intent intent = new Intent(LogInActivity.this, MainActivity.class);
                     startActivity(intent);
+                }
+                else {
+                    Toast.makeText(LogInActivity.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -51,7 +58,13 @@ public class LogInActivity extends AppCompatActivity {
         });
     }
     public boolean validateCardentials(String email, String password){
-        //TODO if email and password are in DB & correct return true
+        if (email.isEmpty() || password.isEmpty()){
+            Toast.makeText(this, "Please fill all the fields", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (sqliteUserHelperDB.checkUser(email, password)){
+            return true;
+        }
         return false;
     }
     public void login(View view){

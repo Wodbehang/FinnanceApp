@@ -41,8 +41,8 @@ public class SignActivity extends AppCompatActivity {
         etRePassword = findViewById(R.id.ETRePassword);
         btnSignUP = findViewById(R.id.BTNSignUp);
         btnSignUP.setOnClickListener(v -> {
-            String username = etUsername.getText().toString();
-            String email = etEmail.getText().toString();
+            String username = etUsername.getText().toString().toLowerCase();
+            String email = etEmail.getText().toString().toLowerCase();
             String password = etPassword.getText().toString();
             String rePassword = etRePassword.getText().toString();
             validateAndCreateUser(username, email, password, rePassword);
