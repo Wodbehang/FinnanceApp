@@ -2,13 +2,11 @@ package com.idk.finnanceapp;
 
 public class User {
     private String username;
-    private int ID;
     private String path;
     private String password;
     private String email;
-    public void User(String username, int ID, String path, String email, String password){
+    public void User(String username, String path, String email, String password){
         this.username = username;
-        this.ID = ID;
         this.path = path;
         this.email = email;
         this.password = password;
@@ -20,10 +18,6 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public int getID() {
-        return ID;
     }
 
     public String getPath() {
