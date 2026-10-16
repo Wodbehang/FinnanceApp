@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,7 +23,7 @@ public class SettingsActivity extends AppCompatActivity {
     Button BTNDeleteUser;
     Utilitis utilitis;
     private SharedPreferencesDB db;
-    private SQLiteDatabase sqLiteDatabase;;
+    SQLiteUserHelperDB sqLiteUserHelperDB;;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +35,7 @@ public class SettingsActivity extends AppCompatActivity {
         BTNLogOut = findViewById(R.id.BTNLogOut);
         BTNDeleteUser = findViewById(R.id.BTNDeleteUser);
         utilitis = new Utilitis();
+        sqLiteUserHelperDB = new SQLiteUserHelperDB(this);
 
         db = SharedPreferencesDB.getInstance(SettingsActivity.this);
 
@@ -73,17 +75,21 @@ public class SettingsActivity extends AppCompatActivity {
         BTNExport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ExportTransactions()) {
-                    File file = new File(getExternalFilesDir(null), "transactions.csv");
+                String username = db.getUsername().trim().toLowerCase();
+
+                File file = ExportTransactions();
+                if (file != null && file.exists()) {
                     Uri uri = androidx.core.content.FileProvider.getUriForFile(SettingsActivity.this, "com.idk.finnanceapp.fileprovider", file);
 
                     Intent shareIntent = new Intent(Intent.ACTION_SEND);
                     shareIntent.setType("text/csv");
                     shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
                     shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    startActivity(shareIntent);
+                    startActivity(Intent.createChooser(shareIntent, "Shere transactions csv file"));
                 }
+
             }
+
         });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -92,14 +98,23 @@ public class SettingsActivity extends AppCompatActivity {
             return insets;
         });
     }
-    public boolean ExportTransactions() {
+    public File ExportTransactions() {
         try {
-            utilitis.saveTransactionsToCVS(db.getTransactions(), getExternalFilesDir(null) + "/transactions.csv");
+            String username = db.getUsername().trim().toLowerCase();
+            String filePath = sqLiteUserHelperDB.getFilePath(username);
+
+            if (filePath == null || filePath.isEmpty()) {
+                sqLiteUserHelperDB.createPath(username);
+                filePath = sqLiteUserHelperDB.getFilePath(username);
+            }
+            utilitis.saveTransactionsToCVS(db.getTransactions(), filePath);
+            File file = new File(filePath);
+
+            return new File(sqLiteUserHelperDB.getFilePath(username));
         }
         catch (Exception e) {
-            return false;
+            e.printStackTrace();
+            return null;
         }
-        return true;
     }
-
 }
