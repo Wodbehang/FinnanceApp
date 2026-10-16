@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferencesDB db;
     SearchView SVSearch;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -345,4 +346,5 @@ public class MainActivity extends AppCompatActivity {
 
                 }).collect(Collectors.toList());
     }
+
 }

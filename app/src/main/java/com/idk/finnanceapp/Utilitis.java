@@ -1,5 +1,9 @@
 package com.idk.finnanceapp;
 
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
@@ -14,6 +18,8 @@ public class Utilitis {
     private String category;
     private String note;
 
+    private Context context;
+
     public void saveTransactionsToCVS(List<Transaction> transactions, String filePath) {
         File file = new File(filePath);
         try (FileWriter writer = new FileWriter(file)) {
@@ -25,4 +31,5 @@ public class Utilitis {
             e.printStackTrace();
         }
     }
+
 }

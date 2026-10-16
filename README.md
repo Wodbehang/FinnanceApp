@@ -1,7 +1,6 @@
 # Finnace tracking app WIP
-> currently it only includes some very basic features such as logging and exporting.
-
 --- 
+currently it only includes some very basic features such as logging and exporting.
 
 ## mainActicity
 
