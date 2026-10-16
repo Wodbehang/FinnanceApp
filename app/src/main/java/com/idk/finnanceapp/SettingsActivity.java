@@ -1,6 +1,7 @@
 package com.idk.finnanceapp;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -17,8 +18,11 @@ import java.io.File;
 public class SettingsActivity extends AppCompatActivity {
     Button BTNClearData;
     Button BTNExport;
+    Button BTNLogOut;
+    Button BTNDeleteUser;
     Utilitis utilitis;
     private SharedPreferencesDB db;
+    private SQLiteDatabase sqLiteDatabase;;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +31,10 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         BTNClearData = findViewById(R.id.BTNClearData);
         BTNExport = findViewById(R.id.BTNExport);
+        BTNLogOut = findViewById(R.id.BTNLogOut);
+        BTNDeleteUser = findViewById(R.id.BTNDeleteUser);
         utilitis = new Utilitis();
+
         db = SharedPreferencesDB.getInstance(SettingsActivity.this);
 
         BTNClearData.setOnClickListener(new View.OnClickListener() {
@@ -40,6 +47,29 @@ public class SettingsActivity extends AppCompatActivity {
                 finish();
             }
         });
+        BTNLogOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.setRememberMe(false);
+                db.removeKeysUser();
+                Intent intent = new Intent(SettingsActivity.this, LogInActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+        BTNDeleteUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                db.setRememberMe(false);
+                db.removeKeysUser();
+                db.removeBalance();
+                db.removeUser();
+                Intent intent = new Intent(SettingsActivity.this, LogInActivity.class);
+                startActivity(intent);
+                finish();
+            }});
+
+
         BTNExport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

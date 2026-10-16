@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.UUID;
 
 public class SQLiteUserHelperDB extends SQLiteOpenHelper {
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     Context context;
 
     public static final String DATABASE_NAME = "SQLUser.db";
@@ -67,6 +67,19 @@ public class SQLiteUserHelperDB extends SQLiteOpenHelper {
         String uniquePath = UUID.randomUUID().toString().substring(0, 8);
         String path = folder.getAbsolutePath() + File.separator + cleanUsername + "_" + uniquePath + ".csv";
         return path;
+    }
+    public void deleteUser(String username){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String selection = SQLiteUser.UserEntry.COLUMN_NAME_USERNAME + " = ?";
+        String[] selectionArgs = { username };
+        db.delete(SQLiteUser.UserEntry.TABLE_NAME, selection, selectionArgs);
+    }
+    public String getPath(String username){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = { SQLiteUser.UserEntry.COLUMN_NAME_PATH };
+        String selection = SQLiteUser.UserEntry.COLUMN_NAME_USERNAME + " = ?";
+        String[] selectionArgs = { username };
+        return db.query(SQLiteUser.UserEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, null).getString(0);
     }
     public boolean checkUser(String input, String password){
         SQLiteDatabase db = this.getReadableDatabase();

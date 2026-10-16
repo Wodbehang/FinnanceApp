@@ -16,6 +16,9 @@ public class SharedPreferencesDB {
     private static final String PREFS_NAME = "FinnanceAppPrefs";
     private static final String KEY_BALANCE = "balance";
     private static final String KEY_TRANSACTIONS = "transactions";
+    private static final String KEY_USERNAME = "username";
+    private static final String KEY_PASSWORD = "password";
+    private static final String KEY_REMEMBER_ME = "remember_me";
     private final Gson gson;
 
     private SharedPreferencesDB(Context context) {
@@ -56,5 +59,30 @@ public class SharedPreferencesDB {
         }
         Type type = new TypeToken<ArrayList<Transaction>>() {}.getType();
         return gson.fromJson(json, type);
+    }
+    public void setKeysUser(String username, String password){
+        sharedPreferences.edit().putString(KEY_USERNAME, username).apply();
+        sharedPreferences.edit().putString(KEY_PASSWORD, password).apply();
+    }
+    public void setRememberMe(boolean rememberMe){
+        sharedPreferences.edit().putBoolean(KEY_REMEMBER_ME, rememberMe).apply();
+    }
+    public boolean isRememberMe(){
+        return sharedPreferences.getBoolean(KEY_REMEMBER_ME, false);
+    }
+    public String getUsername(){
+        return sharedPreferences.getString(KEY_USERNAME, null);
+    }
+    public String getPassword(){
+        return sharedPreferences.getString(KEY_PASSWORD, null);
+    }
+    public void removeKeysUser() {
+        sharedPreferences.edit().remove(KEY_USERNAME).apply();
+        sharedPreferences.edit().remove(KEY_PASSWORD).apply();
+    }
+    public void removeUser() {
+        sharedPreferences.edit().remove(KEY_USERNAME).apply();
+        sharedPreferences.edit().remove(KEY_PASSWORD).apply();
+        sharedPreferences.edit().remove(KEY_REMEMBER_ME).apply();
     }
 }

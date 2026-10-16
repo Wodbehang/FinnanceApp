@@ -32,4 +32,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/BTNClearData" />
 
+    <Button
+        android:id="@+id/BTNLogOut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:backgroundTint="@color/red"
+        android:text="LogOut"
+        app:layout_constraintBottom_toBottomOf="@id/BTNClearData"
+        app:layout_constraintStart_toEndOf="@id/BTNClearData" />
+    <Button
+        android:id="@+id/BTNDeleteUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:backgroundTint="@color/red"
+        android:text="Delete User"
+        app:layout_constraintBottom_toBottomOf="@id/BTNClearData"
+        app:layout_constraintStart_toEndOf="@id/BTNLogOut" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
