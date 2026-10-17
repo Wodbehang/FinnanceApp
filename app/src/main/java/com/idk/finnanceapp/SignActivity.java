@@ -63,6 +63,8 @@ public class SignActivity extends AppCompatActivity {
     public void validateAndCreateUser(String username, String email,String password, String rePassword){
         if (validateUsername(username) && validateEmail(email) && validatePassword(password, rePassword)){
             sqliteUserHelperDB.newUser(username, email, password);
+            SharedPreferencesDB sharedPreferencesDB = SharedPreferencesDB.getInstance(this);
+            sharedPreferencesDB.setKeysUser(username, password);
             Toast.makeText(this, "User registered successfully", Toast.LENGTH_SHORT).show();
             intentMain();
             finish();

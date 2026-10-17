@@ -32,7 +32,7 @@ public class SharedPreferencesDB {
         return instance;
     }
 
-    public void setBalance(double balance) {
+/*    public void setBalance(double balance) {
         sharedPreferences.edit().putFloat(KEY_BALANCE, (float) balance).apply();
     }
     public double getBalance() {
@@ -59,7 +59,7 @@ public class SharedPreferencesDB {
         }
         Type type = new TypeToken<ArrayList<Transaction>>() {}.getType();
         return gson.fromJson(json, type);
-    }
+    }*/
     public void setKeysUser(String username, String password){
         sharedPreferences.edit().putString(KEY_USERNAME, username).apply();
         sharedPreferences.edit().putString(KEY_PASSWORD, password).apply();

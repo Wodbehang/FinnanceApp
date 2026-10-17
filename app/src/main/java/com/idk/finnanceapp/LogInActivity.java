@@ -53,8 +53,8 @@ public class LogInActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(validateCardentials(username.getText().toString().toLowerCase(), password.getText().toString())){
+                    sharedPreferencesDB.setKeysUser(username.getText().toString(), password.getText().toString());
                     if (cbRememberMe.isChecked()){
-                        sharedPreferencesDB.setKeysUser(username.getText().toString(), password.getText().toString());
                         sharedPreferencesDB.setRememberMe(true);
                         username.setText(sharedPreferencesDB.getUsername());
                         password.setText(sharedPreferencesDB.getPassword());

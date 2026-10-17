@@ -74,12 +74,17 @@ public class SQLiteUserHelperDB extends SQLiteOpenHelper {
         String[] selectionArgs = { username };
         db.delete(SQLiteUser.UserEntry.TABLE_NAME, selection, selectionArgs);
     }
-    public String getFilePath(String username){
-        if (username == null) return null;
+    public String getFilePath(String input){
+        if (input == null) return null;
         SQLiteDatabase db = this.getReadableDatabase();
         String[] columns = { SQLiteUser.UserEntry.COLUMN_NAME_PATH };
-        String selection = SQLiteUser.UserEntry.COLUMN_NAME_USERNAME + " = ?";
-        String[] selectionArgs = { username };
+        String trimmedInput = input.trim().toLowerCase();
+        String normalizedInput = stopDuplicateEmail(input);
+
+        String selection = "LOWER(" + SQLiteUser.UserEntry.COLUMN_NAME_USERNAME + ") = ? OR " +
+                "LOWER(" + SQLiteUser.UserEntry.COLUMN_NAME_EMAIL + ") = ? OR " +
+                "LOWER(" + SQLiteUser.UserEntry.COLUMN_NAME_EMAIL + ") = ?";
+        String[] selectionArgs = { trimmedInput, normalizedInput, trimmedInput };
         Cursor cursor = db.query(SQLiteUser.UserEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
         try {
             if (cursor.moveToFirst()) {

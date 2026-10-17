@@ -1,12 +1,10 @@
 package com.idk.finnanceapp;
 
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,13 +13,14 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class SettingsActivity extends AppCompatActivity {
     Button BTNClearData;
     Button BTNExport;
     Button BTNLogOut;
     Button BTNDeleteUser;
-    Utilitis utilitis;
+    CSVHelper csvHelper;
     private SharedPreferencesDB db;
     SQLiteUserHelperDB sqLiteUserHelperDB;;
 
@@ -34,7 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
         BTNExport = findViewById(R.id.BTNExport);
         BTNLogOut = findViewById(R.id.BTNLogOut);
         BTNDeleteUser = findViewById(R.id.BTNDeleteUser);
-        utilitis = new Utilitis();
+        csvHelper = new CSVHelper();
         sqLiteUserHelperDB = new SQLiteUserHelperDB(this);
 
         db = SharedPreferencesDB.getInstance(SettingsActivity.this);
@@ -42,8 +41,15 @@ public class SettingsActivity extends AppCompatActivity {
         BTNClearData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                db.clear();
-                db.removeBalance();
+/*                db.clear();
+                db.removeBalance();*/
+                String username = db.getUsername();
+                if (username != null && !username.trim().isEmpty()) {
+                    String filePath = sqLiteUserHelperDB.getFilePath(username.trim().toLowerCase());
+                    if (filePath != null) {
+                        csvHelper.saveCSV(filePath, 0.0, new ArrayList<>());
+                    }
+                }
                 Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
@@ -62,9 +68,20 @@ public class SettingsActivity extends AppCompatActivity {
         BTNDeleteUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String username = db.getUsername();
+                if (username != null && !username.trim().isEmpty()) {
+                    String filePath = sqLiteUserHelperDB.getFilePath(username.trim().toLowerCase());
+                    if (filePath != null) {
+                        File file = new File(filePath);
+                        if (file.exists()) {
+                            file.delete();
+                        }
+                    }
+                    sqLiteUserHelperDB.deleteUser(username.trim().toLowerCase());
+                }
                 db.setRememberMe(false);
                 db.removeKeysUser();
-                db.removeBalance();
+//                db.removeBalance();
                 db.removeUser();
                 Intent intent = new Intent(SettingsActivity.this, LogInActivity.class);
                 startActivity(intent);
@@ -107,10 +124,11 @@ public class SettingsActivity extends AppCompatActivity {
                 sqLiteUserHelperDB.createPath(username);
                 filePath = sqLiteUserHelperDB.getFilePath(username);
             }
-            utilitis.saveTransactionsToCVS(db.getTransactions(), filePath);
-            File file = new File(filePath);
+            double balance = csvHelper.readBalanceFromCSV(filePath);
+            java.util.List<Transaction> transactions = csvHelper.readTransactionsFromCSV(filePath);
+            csvHelper.saveCSV(filePath, balance, transactions);
 
-            return new File(sqLiteUserHelperDB.getFilePath(username));
+            return new File(filePath);
         }
         catch (Exception e) {
             e.printStackTrace();

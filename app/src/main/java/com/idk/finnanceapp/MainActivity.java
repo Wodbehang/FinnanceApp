@@ -25,6 +25,7 @@ import com.idk.finnanceapp.RecycleView.Adapter;
 import com.idk.finnanceapp.RecycleView.Date;
 import com.idk.finnanceapp.Transaction;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -39,8 +40,27 @@ public class MainActivity extends AppCompatActivity {
     private List<Transaction> transactions = new ArrayList<>();
     private double initialBalance = 0;
     private SharedPreferencesDB db;
+    private CSVHelper csvHelper;
+    private SQLiteUserHelperDB sqLiteUserHelperDB;
     SearchView SVSearch;
 
+    private String getUserFilePath() {
+        String username = db.getUsername();
+        if (username != null && !username.trim().isEmpty()) {
+            username = username.trim().toLowerCase();
+            String filePath = sqLiteUserHelperDB.getFilePath(username);
+            if (filePath != null && !filePath.isEmpty()) {
+                return filePath;
+            } else {
+                return sqLiteUserHelperDB.createPath(username);
+            }
+        }
+        File defaultFolder = new File(getFilesDir(), "user_csv_data");
+        if (!defaultFolder.exists()) {
+            defaultFolder.mkdirs();
+        }
+        return new File(defaultFolder, "default_user.csv").getAbsolutePath();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,14 +79,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         db = SharedPreferencesDB.getInstance(this);
-        if (!db.hasBalance()) {
+        csvHelper = new CSVHelper();
+        sqLiteUserHelperDB = new SQLiteUserHelperDB(this);
+
+        String filePath = getUserFilePath();
+        if (!csvHelper.hasBalanceInCSV(filePath)) {
             setBalance(null);
         } else {
-            initialBalance = db.getBalance();
+            initialBalance = csvHelper.readBalanceFromCSV(filePath);
             updateBalanceDisplay();
         }
         transactions.clear();
-        transactions.addAll(db.getTransactions());
+        transactions.addAll(csvHelper.readTransactionsFromCSV(filePath));
         transactions = sortByDate(transactions);
 
         RVTransatcions.setLayoutManager(new LinearLayoutManager(this));
@@ -117,14 +141,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (!db.hasBalance()) {
+        String filePath = getUserFilePath();
+        if (!csvHelper.hasBalanceInCSV(filePath)) {
             initialBalance = 0;
             setBalance(null);
         } else {
-            initialBalance = db.getBalance();
+            initialBalance = csvHelper.readBalanceFromCSV(filePath);
         }
 
-        List<Transaction> freshData = db.getTransactions();
+        List<Transaction> freshData = csvHelper.readTransactionsFromCSV(filePath);
         freshData = sortByDate(freshData);
         transactions.clear();
         transactions.addAll(freshData);
@@ -135,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
         updateBalanceDisplay();
     }
 
-    public Dialog openAddTransaction(View view,Adapter adapter) {
+    public Dialog openAddTransaction(View view, Adapter adapter) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.add_transaction_dialog, null);
         builder.setView(dialogView);
@@ -198,7 +223,8 @@ public class MainActivity extends AppCompatActivity {
                     newTransaction = new Transaction(transactions.size() + 1, title, amount, date, isExpense ? 1 : 0, catagory, note);
                 }
                 transactions.add(newTransaction);
-                db.saveTransactions(transactions);
+                String filePath = getUserFilePath();
+                csvHelper.saveCSV(filePath, initialBalance, transactions);
                 Search(SVSearch.getQuery().toString());
                 updateBalanceDisplay();
                 dialog.dismiss();
@@ -247,7 +273,9 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 initialBalance = Double.parseDouble(balanceStr);
-                db.setBalance(initialBalance);
+                /*db.setBalance(initialBalance);*/
+                String filePath = getUserFilePath();
+                csvHelper.saveCSV(filePath, initialBalance, transactions);
                 updateBalanceDisplay();
                 dialog.dismiss();
             }
@@ -256,19 +284,22 @@ public class MainActivity extends AppCompatActivity {
     }
     public void removeTransaction(Transaction transaction) {
         transactions.remove(transaction);
-        db.saveTransactions(transactions);
+        String filePath = getUserFilePath();
+        csvHelper.saveCSV(filePath, initialBalance, transactions);
         updateBalanceDisplay();
     }
 
     private void updateBalanceDisplay() {
         double totalTransactions = 0;
         for (Transaction t : transactions) {
-            double amt = Double.parseDouble(t.getAmount());
-            if (t.getType() == 0) {
-                totalTransactions += amt;
-            } else {
-                totalTransactions -= amt;
-            }
+            try {
+                double amt = Double.parseDouble(t.getAmount());
+                if (t.getType() == 0) {
+                    totalTransactions += amt;
+                } else {
+                    totalTransactions -= amt;
+                }
+            } catch (NumberFormatException ignored) {}
         }
         double currentBalance = initialBalance + totalTransactions;
         TVBalanceNumber.setText(String.format("%.2f (%.2f)", currentBalance, initialBalance));
