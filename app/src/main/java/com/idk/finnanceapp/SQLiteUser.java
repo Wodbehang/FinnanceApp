@@ -11,8 +11,6 @@ public class SQLiteUser {
     public static class UserEntry implements BaseColumns {
         public static final String TABLE_NAME = "users";
 
-        // Columns
-        // BaseColumns._ID provides "_id" automatically
         public static final String COLUMN_NAME_USERNAME = "username";
         public static final String COLUMN_NAME_PATH = "path";
         public static final String COLUMN_NAME_PASSWORD = "password";

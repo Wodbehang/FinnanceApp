@@ -66,4 +66,24 @@ public class Transaction {
 
         return STransaction;
     }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public void setCategory(String category) {
+        this.category = category;
+    }
+    public void setNote(String note) {
+        this.note = note;
+    }
+    public void setAmount(String amount) {
+        this.amount = amount;
+    }
+    public void setDate(Date date) {
+        this.date = date;
+    }
+    public void setType(int type) {
+        this.type = type;
+    }
 }
+

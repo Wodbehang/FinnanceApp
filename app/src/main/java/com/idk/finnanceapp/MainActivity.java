@@ -299,34 +299,134 @@ public class MainActivity extends AppCompatActivity {
         TextView TVTransactoinCatagory = dialogView.findViewById(R.id.TVTransactoinCatagory);
         TextView TVTransactoinAmount = dialogView.findViewById(R.id.TVTransactoinAmount);
         TextView TVTransactoinNote = dialogView.findViewById(R.id.TVTransactoinNote);
+
         Button BTNEdit = dialogView.findViewById(R.id.BTNEdit);
         Button BTNDelete = dialogView.findViewById(R.id.BTNDelete);
-        TVTransactoinName.setText(transaction.getTitle());
-        TVTransactoinDate.setText("Date: " + transaction.getDate().toString());
-        TVTransactoinCatagory.setText(transaction.getCategory());
-        if (transaction.getType() == 0) {
-            TVTransactoinAmount.setText("Amount: " + transaction.getAmount());
-        } else {
-            TVTransactoinAmount.setText("Amount: - " + transaction.getAmount());
+
+        if (TVTransactoinName != null) {
+            TVTransactoinName.setText(transaction.getTitle() != null ? transaction.getTitle() : "");
         }
-        TVTransactoinNote.setText(transaction.getNote());
-
-
-        BTNEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //TODO make this make the window editable
-                dialog.dismiss();
+        if (TVTransactoinDate != null) {
+            String dateStr = transaction.getDate() != null ? transaction.getDate().toString() : "";
+            TVTransactoinDate.setText("Date: " + dateStr);
+        }
+        if (TVTransactoinCatagory != null) {
+            TVTransactoinCatagory.setText(transaction.getCategory() != null ? transaction.getCategory() : "");
+        }
+        if (TVTransactoinAmount != null) {
+            String amountStr = transaction.getAmount() != null ? transaction.getAmount() : "0";
+            if (transaction.getType() == 0) {
+                TVTransactoinAmount.setText("Amount: + " + amountStr);
+            } else {
+                TVTransactoinAmount.setText("Amount: - " + amountStr);
             }
-        });
-        BTNDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                removeTransaction(transaction);
-                Search(SVSearch.getQuery().toString());
-                dialog.dismiss();
+        }
+        if (TVTransactoinNote != null) {
+            TVTransactoinNote.setText(transaction.getNote() != null ? transaction.getNote() : "");
+        }
+
+        if (BTNEdit != null) {
+            BTNEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                    editTransaction(transaction, adapter);
+                }
+            });
+        }
+        if (BTNDelete != null) {
+            BTNDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    removeTransaction(transaction);
+                    Search(SVSearch.getQuery().toString());
+                    dialog.dismiss();
+                }
+            });
+        }
+        return dialog;
+    }
+    public Dialog editTransaction(Transaction transaction, Adapter adapter) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.edit_transaction_dialog, null);
+        builder.setView(dialogView);
+        Dialog dialog = builder.create();
+        dialog.show();
+        Button BTNSaveTransactionDialog = dialogView.findViewById(R.id.BTNSaveTransactionDialog);
+        EditText ETTransactoinName = dialogView.findViewById(R.id.ETTransactoinName);
+        EditText ETTransactoinDate = dialogView.findViewById(R.id.ETTransactoinDate);
+        EditText ETTransactoinCatagory = dialogView.findViewById(R.id.ETTransactoinCatagory);
+        EditText ETTransactoinAmount = dialogView.findViewById(R.id.ETTransactoinAmount);
+        EditText ETTransactoinNote = dialogView.findViewById(R.id.ETTransactoinNote);
+        CheckBox CBIsExpenseEditDialog = dialogView.findViewById(R.id.CBIsExpenseEditDialog);
+
+        if (ETTransactoinName != null) {
+            ETTransactoinName.setText(transaction.getTitle() != null ? transaction.getTitle() : "");
+        }
+        if (ETTransactoinDate != null) {
+            ETTransactoinDate.setText(transaction.getDate() != null ? transaction.getDate().toString() : "");
+        }
+        if (ETTransactoinCatagory != null) {
+            ETTransactoinCatagory.setText(transaction.getCategory() != null ? transaction.getCategory() : "");
+        }
+        if (ETTransactoinAmount != null) {
+            ETTransactoinAmount.setText(transaction.getAmount() != null ? transaction.getAmount() : "");
+        }
+        if (ETTransactoinNote != null) {
+            ETTransactoinNote.setText(transaction.getNote() != null ? transaction.getNote() : "");
+        }
+        if (CBIsExpenseEditDialog != null) {
+            if (transaction.getType() == 0) {
+                CBIsExpenseEditDialog.setChecked(false);
+            } else {
+                CBIsExpenseEditDialog.setChecked(true);
             }
-        });
+        }
+        if (BTNSaveTransactionDialog != null) {
+            BTNSaveTransactionDialog.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (ETTransactoinDate != null) {
+                        String[] dateParts = ETTransactoinDate.getText().toString().split("[.\\s/]+");
+                        Date date = null;
+                        if (dateParts.length >= 3) {
+                            try {
+                                date = new Date(Integer.parseInt(dateParts[0]), Integer.parseInt(dateParts[1]), Integer.parseInt(dateParts[2]));
+                            } catch (NumberFormatException ignored) {}
+                        }
+                        if (date == null) {
+                            date = new Date(0, 0, 0);
+                        }
+                        transaction.setDate(date);
+                    }
+                    if (ETTransactoinName != null) {
+                        transaction.setTitle(ETTransactoinName.getText().toString());
+                    }
+                    if (ETTransactoinCatagory != null) {
+                        transaction.setCategory(ETTransactoinCatagory.getText().toString());
+                    }
+                    if (ETTransactoinAmount != null) {
+                        transaction.setAmount(ETTransactoinAmount.getText().toString());
+                    }
+                    if (ETTransactoinNote != null) {
+                        transaction.setNote(ETTransactoinNote.getText().toString());
+                    }
+                    if (CBIsExpenseEditDialog != null) {
+                        if (CBIsExpenseEditDialog.isChecked()) {
+                            transaction.setType(1);
+                        } else {
+                            transaction.setType(0);
+                        }
+                    }
+                    String filePath = getUserFilePath();
+                    csvHelper.saveCSV(filePath, initialBalance, transactions);
+                    Search(SVSearch.getQuery().toString());
+                    updateBalanceDisplay();
+                    dialog.dismiss();
+                }
+            });
+        }
+
         return dialog;
     }
     public void removeTransaction(Transaction transaction) {

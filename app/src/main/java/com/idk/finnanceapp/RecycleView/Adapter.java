@@ -89,14 +89,16 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         }
 
         public void bind(Transaction transaction) {
+            if (transaction == null) return;
             TVID.setText(String.valueOf(transaction.getID()));
-            TVTitle.setText(transaction.getTitle());
+            TVTitle.setText(transaction.getTitle() != null ? transaction.getTitle() : "");
+            String amountStr = transaction.getAmount() != null ? transaction.getAmount() : "0";
             if (transaction.getType() == 0) {
-                TVAmount.setText("+ " + transaction.getAmount());
+                TVAmount.setText("+ " + amountStr);
             } else {
-                TVAmount.setText("- " + transaction.getAmount());
+                TVAmount.setText("- " + amountStr);
             }
-            TVDate.setText(transaction.getDate().toString());
+            TVDate.setText(transaction.getDate() != null ? transaction.getDate().toString() : "");
         }
     }
     public void setFilteredList(List<Transaction> filteredList) {
