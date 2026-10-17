@@ -18,6 +18,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     private List<Transaction> transactions;
     private Context context;
     private onItemLongClickListener longClickListener;
+    private onItemClickListener clickListener;
     public Adapter(List<Transaction> transactions, Context context) {
         this.transactions = transactions;
         this.context = context;
@@ -35,10 +36,29 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     public void setOnItemLongClickListener(onItemLongClickListener listener) {
         longClickListener = listener;
     }
+    public interface onItemClickListener {
+        void onItemClick(Transaction transaction);
+    }
+    public void setOnItemClickListener(onItemClickListener listener) {
+        clickListener = listener;
+    }
+
 
     public void onBindViewHolder(ViewHolder holder, int position) {
         Transaction transaction = transactions.get(position);
         holder.bind(transaction);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int pos = holder.getBindingAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION) {
+                    Transaction clickedTransaction = transactions.get(pos);
+                    if (clickListener != null) {
+                        clickListener.onItemClick(clickedTransaction);
+                    }
+                }
+            }
+        });
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {

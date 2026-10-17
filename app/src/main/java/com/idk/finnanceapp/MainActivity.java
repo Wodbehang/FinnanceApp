@@ -129,6 +129,12 @@ public class MainActivity extends AppCompatActivity {
                 DeleteTransaction(transaction, adapter);
             }
         });
+        adapter.setOnItemClickListener(new Adapter.onItemClickListener() {
+            @Override
+            public void onItemClick(Transaction transaction) {
+                viewTransaction(transaction, adapter);
+            }
+        });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -282,6 +288,47 @@ public class MainActivity extends AppCompatActivity {
         });
         return dialog;
     }
+    public Dialog viewTransaction(Transaction transaction, Adapter adapter) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.transaction_dialog, null);
+        builder.setView(dialogView);
+        Dialog dialog = builder.create();
+        dialog.show();
+        TextView TVTransactoinName = dialogView.findViewById(R.id.TVTransactoinName);
+        TextView TVTransactoinDate = dialogView.findViewById(R.id.TVTransactoinDate);
+        TextView TVTransactoinCatagory = dialogView.findViewById(R.id.TVTransactoinCatagory);
+        TextView TVTransactoinAmount = dialogView.findViewById(R.id.TVTransactoinAmount);
+        TextView TVTransactoinNote = dialogView.findViewById(R.id.TVTransactoinNote);
+        Button BTNEdit = dialogView.findViewById(R.id.BTNEdit);
+        Button BTNDelete = dialogView.findViewById(R.id.BTNDelete);
+        TVTransactoinName.setText(transaction.getTitle());
+        TVTransactoinDate.setText("Date: " + transaction.getDate().toString());
+        TVTransactoinCatagory.setText(transaction.getCategory());
+        if (transaction.getType() == 0) {
+            TVTransactoinAmount.setText("Amount: " + transaction.getAmount());
+        } else {
+            TVTransactoinAmount.setText("Amount: - " + transaction.getAmount());
+        }
+        TVTransactoinNote.setText(transaction.getNote());
+
+
+        BTNEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO make this make the window editable
+                dialog.dismiss();
+            }
+        });
+        BTNDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeTransaction(transaction);
+                Search(SVSearch.getQuery().toString());
+                dialog.dismiss();
+            }
+        });
+        return dialog;
+    }
     public void removeTransaction(Transaction transaction) {
         transactions.remove(transaction);
         String filePath = getUserFilePath();
@@ -377,5 +424,6 @@ public class MainActivity extends AppCompatActivity {
 
                 }).collect(Collectors.toList());
     }
+
 
 }
