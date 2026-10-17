@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
 public class SQLiteUser {
-    //TODO implement table with usernames passwords paths and emails.
 
     public static class UserEntry implements BaseColumns {
         public static final String TABLE_NAME = "users";

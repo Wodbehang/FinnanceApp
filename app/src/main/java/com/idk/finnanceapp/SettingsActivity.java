@@ -12,6 +12,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.idk.finnanceapp.RecycleView.DebugActivity;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -20,6 +22,7 @@ public class SettingsActivity extends AppCompatActivity {
     Button BTNExport;
     Button BTNLogOut;
     Button BTNDeleteUser;
+    Button BTNDebug;
     CSVHelper csvHelper;
     private SharedPreferencesDB db;
     SQLiteUserHelperDB sqLiteUserHelperDB;;
@@ -33,10 +36,18 @@ public class SettingsActivity extends AppCompatActivity {
         BTNExport = findViewById(R.id.BTNExport);
         BTNLogOut = findViewById(R.id.BTNLogOut);
         BTNDeleteUser = findViewById(R.id.BTNDeleteUser);
+        BTNDebug = findViewById(R.id.BTNDebug);
         csvHelper = new CSVHelper();
         sqLiteUserHelperDB = new SQLiteUserHelperDB(this);
 
         db = SharedPreferencesDB.getInstance(SettingsActivity.this);
+        BTNDebug.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(SettingsActivity.this, DebugActivity.class);
+                startActivity(intent);
+            }
+        });
 
         BTNClearData.setOnClickListener(new View.OnClickListener() {
             @Override
