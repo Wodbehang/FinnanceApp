@@ -1,6 +1,6 @@
 # Finnace tracking app WIP
 --- 
-currently it only includes some very basic features such as logging and exporting.
+pretty basic tracking app. works on CSV files allowing to export them easily. very very badly optimized as it runs on csv files so its not useful for more then around 15 transactions(Itll become super slow and crush a lot)
 
 ## mainActicity
 
@@ -23,9 +23,4 @@ simply downloading and running the APK file from the realeses and pressing allow
 ---
 
 ## WIP features:
-- Import
-- Polishing
-- UI
-
-## planned updates
-- Visual graphs
+- Optmizing preformance
