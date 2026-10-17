@@ -23,12 +23,9 @@ simply downloading and running the APK file from the realeses and pressing allow
 ---
 
 ## WIP features:
-- Import/Export
-- Catagories
-- Notes
+- Import
 - Polishing
 - UI
 
 ## planned updates
 - Visual graphs
-- Users
