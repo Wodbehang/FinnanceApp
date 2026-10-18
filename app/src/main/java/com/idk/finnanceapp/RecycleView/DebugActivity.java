@@ -85,21 +85,23 @@ public class DebugActivity extends AppCompatActivity {
         return new File(defaultFolder, "default_user.csv").getAbsolutePath();
     }
     public void testTransactions(){
-        List<Transaction> transactions = new ArrayList<>();
+        String filePath = getUserFilePath();
+        double balance = csvHelper.readBalanceFromCSV(filePath);
+        List<Transaction> transactions = csvHelper.readTransactionsFromCSV(filePath);
+        int startingId = transactions.size() + 1;
+
         for (int i = 0; i < 10; i++) {
-            Transaction newTransaction;
-            String filePath = getUserFilePath();
-            transactions.addAll(csvHelper.readTransactionsFromCSV(filePath));
             boolean isExpense = Math.random() < 0.5;
-            String title = "Transaction " + i;
-            String amount = String.valueOf(Math.random() * 1000);
-            Date date = new Date((i * i/10), i ^ i*10, i * i*10);
-            String catagory = "Category " + i;
-            String note = "Note " + i;
-            newTransaction = new Transaction(transactions.size() + 1, title, amount, date, isExpense ? 1 : 0, catagory, note);
+            String title = "Transaction " + (startingId + i);
+            String amount = String.format(java.util.Locale.US, "%.2f", Math.random() * 1000);
+            Date date = new Date(1 + (i % 28), 1 + (i % 12), i*1000);
+            String catagory = "Category " + (i % 5);
+            String note = "Note " + (i + 1);
+            Transaction newTransaction = new Transaction(
+                transactions.size() + 1, title, amount, date, isExpense ? 1 : 0, catagory, note);
             transactions.add(newTransaction);
-            csvHelper.saveCSV(filePath, 0.0, transactions);
         }
+        csvHelper.saveCSV(filePath, balance, transactions);
     }
     public void intentMain(){
         Intent intent = new Intent(this, MainActivity.class);
