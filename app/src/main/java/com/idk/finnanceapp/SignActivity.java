@@ -85,7 +85,11 @@ public class SignActivity extends AppCompatActivity {
             Toast.makeText(this, "Email must not be empty", Toast.LENGTH_SHORT).show();
             return false;
         }
-        if (!Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()) {
+        else if (sqliteUserHelperDB.doesMailExist(email)){
+            Toast.makeText(this, "Email already exists", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        else if (!Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()) {
             Toast.makeText(this, "Invalid email format", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -93,6 +97,14 @@ public class SignActivity extends AppCompatActivity {
     }
     public boolean validatePassword(String password,String rePassword){
         if (!(password == null && password.isEmpty())){
+            if (password.length() < 8){
+                Toast.makeText(this, "Password must be at least 8 characters long", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            if (!PASSWORD_PATTERN.matcher(password).matches()){
+                Toast.makeText(this, "Password must contain at least 1 capital letter, 1 letter, 1 special character and number", Toast.LENGTH_SHORT).show();
+                return false;
+            }
             if (rePassword == null || rePassword.isEmpty()){
                 Toast.makeText(this, "Please confirm password", Toast.LENGTH_SHORT).show();
                 return false;

@@ -44,6 +44,17 @@ public class SQLiteUserHelperDB extends SQLiteOpenHelper {
         }
         return trimmedEmail.replace(".", "");
     }
+    public boolean doesMailExist(String email){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String[] columns = { SQLiteUser.UserEntry._ID };
+        String selection = SQLiteUser.UserEntry.COLUMN_NAME_EMAIL + " = ?";
+        String[] selectionArgs = { email };
+        Cursor cursor = db.query(SQLiteUser.UserEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+        int cursorCount = cursor.getCount();
+        cursor.close();
+        db.close();
+        return cursorCount > 0;
+    }
 
     public void newUser(String username, String email, String password){
         SQLiteDatabase db = this.getWritableDatabase();
